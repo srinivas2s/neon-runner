@@ -33,22 +33,48 @@ export class World {
         this.spawnTimer = 0;
         this.spawnInterval = 1.5;
         this.sceneryTimer = 0;
+
+        // Track offset for scrolling animation
+        this.lineOffset = 0;
     }
 
     createTrack() {
-        const lineGeo = new THREE.PlaneGeometry(0.1, 1000);
-        const lineMat = new THREE.MeshBasicMaterial({ color: 0x00ffff }); // Cyan lines
+        const lineGeo = new THREE.PlaneGeometry(0.15, 1000);
+        const lineMat = new THREE.MeshStandardMaterial({
+            color: 0x00ffff,
+            emissive: 0x00ffff,
+            emissiveIntensity: 0.1
+        });
 
-        const line1 = new THREE.Mesh(lineGeo, lineMat);
-        line1.rotation.x = -Math.PI / 2;
-        line1.position.set(-1.25, 0.02, 0);
+        this.line1 = new THREE.Mesh(lineGeo, lineMat);
+        this.line1.rotation.x = -Math.PI / 2;
+        this.line1.position.set(-1.25, 0.02, 0);
 
-        const line2 = new THREE.Mesh(lineGeo, lineMat);
-        line2.rotation.x = -Math.PI / 2;
-        line2.position.set(1.25, 0.02, 0);
+        this.line2 = new THREE.Mesh(lineGeo, lineMat);
+        this.line2.rotation.x = -Math.PI / 2;
+        this.line2.position.set(1.25, 0.02, 0);
 
-        this.game.scene.add(line1);
-        this.game.scene.add(line2);
+        this.game.scene.add(this.line1);
+        this.game.scene.add(this.line2);
+
+        // Add side "walls" or boundaries that glow
+        const wallGeo = new THREE.PlaneGeometry(0.05, 1000);
+        const wallMat = new THREE.MeshStandardMaterial({
+            color: 0xff00ff,
+            emissive: 0xff00ff,
+            emissiveIntensity: 0.1
+        });
+
+        const wallL = new THREE.Mesh(wallGeo, wallMat);
+        wallL.rotation.x = -Math.PI / 2;
+        wallL.position.set(-3.5, 0.02, 0);
+
+        const wallR = new THREE.Mesh(wallGeo, wallMat);
+        wallR.rotation.x = -Math.PI / 2;
+        wallR.position.set(3.5, 0.02, 0);
+
+        this.game.scene.add(wallL);
+        this.game.scene.add(wallR);
     }
 
     reset() {
@@ -73,11 +99,12 @@ export class World {
         const rand = Math.random();
 
         if (rand < 0.7) {
-            // Neon Obstacle
-            const geo = new THREE.BoxGeometry(2, 2, 1);
+            // Further Reduced Obstacle Size for high precision
+            const geo = new THREE.BoxGeometry(1.2, 1.2, 1.5);
             const mat = new THREE.MeshStandardMaterial({
-                color: 0xff0055, // Hot pink
-                emissive: 0x550011,
+                color: 0xff0055,
+                emissive: 0xff0055,
+                emissiveIntensity: 0.5,
                 roughness: 0.1,
                 metalness: 0.5
             });
@@ -87,12 +114,32 @@ export class World {
             this.game.scene.add(mesh);
 
             this.objects.push({ mesh, type: 'obstacle', active: true });
+        } else if (rand < 0.8) {
+            // Moving Drone
+            const geo = new THREE.SphereGeometry(0.8, 8, 8);
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0x00ffff,
+                emissive: 0x00ffff,
+                emissiveIntensity: 2,
+                wireframe: true
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(xPos, 3, -80); // Higher up
+            this.game.scene.add(mesh);
+            this.objects.push({
+                mesh,
+                type: 'drone',
+                active: true,
+                moveDir: Math.random() > 0.5 ? 1 : -1,
+                birth: Date.now()
+            });
         } else if (rand < 0.9) {
             // Neon Coin
             const geo = new THREE.CylinderGeometry(0.5, 0.5, 0.1, 16);
             const mat = new THREE.MeshStandardMaterial({
                 color: 0xffff00,
-                emissive: 0xaa5500,
+                emissive: 0xffff00,
+                emissiveIntensity: 0.5,
                 metalness: 1,
                 roughness: 0.1
             });
@@ -106,8 +153,9 @@ export class World {
             // Fast Symbol (Icosahedron)
             const geo = new THREE.IcosahedronGeometry(0.5, 0);
             const mat = new THREE.MeshStandardMaterial({
-                color: 0x00ffff, // Cyan
-                emissive: 0x005555,
+                color: 0x00ffff,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.5,
                 metalness: 1,
                 roughness: 0.1
             });
@@ -117,11 +165,12 @@ export class World {
 
             this.objects.push({ mesh, type: 'fast', active: true });
         } else if (rand < 0.97) {
-            // Magnet (Red Sphere)
+            // Magnet 
             const geo = new THREE.SphereGeometry(0.5, 16, 16);
             const mat = new THREE.MeshStandardMaterial({
                 color: 0xff0000,
-                emissive: 0x550000,
+                emissive: 0xff0000,
+                emissiveIntensity: 0.5,
                 metalness: 1,
                 roughness: 0
             });
@@ -130,11 +179,12 @@ export class World {
             this.game.scene.add(mesh);
             this.objects.push({ mesh, type: 'magnet', active: true });
         } else {
-            // Shield (Green Box for now - simplified)
-            const geo = new THREE.BoxGeometry(0.7, 0.7, 0.1);
+            // Shield
+            const geo = new THREE.TorusGeometry(0.4, 0.1, 16, 32);
             const mat = new THREE.MeshStandardMaterial({
                 color: 0x00ff00,
-                emissive: 0x005500,
+                emissive: 0x00ff00,
+                emissiveIntensity: 0.5,
                 metalness: 1,
                 roughness: 0
             });
@@ -155,6 +205,7 @@ export class World {
         const mat = new THREE.MeshStandardMaterial({
             color: 0x001133,
             emissive: 0x000510,
+            emissiveIntensity: 0,
             roughness: 0.2
         });
         const mesh = new THREE.Mesh(geo, mat);
@@ -189,11 +240,16 @@ export class World {
             this.sceneryTimer = 0;
         }
 
-        // Move Grid Effect (Fake movement)
-        // this.gridHelper.position.z += this.speed * dt;
-        // if (this.gridHelper.position.z > 0) this.gridHelper.position.z = -100;
+        // Fake Grid Movement
+        this.lineOffset += this.speed * dt;
+        if (this.lineOffset > 10) this.lineOffset = 0;
 
-        // Move Objects
+        // We can use a trick: move the grid helper and snap it back
+        this.gridHelper.position.z += this.speed * dt;
+        if (this.gridHelper.position.z > -390) this.gridHelper.position.z = -400;
+
+        // Very forgiving damage area (Reduced Hitbox)
+        this.game.player.mesh.updateMatrixWorld();
         const playerBox = new THREE.Box3().setFromObject(this.game.player.mesh);
         playerBox.expandByScalar(-0.3);
 
@@ -215,6 +271,12 @@ export class World {
                 }
             }
 
+            if (obj.type === 'drone' && obj.active) {
+                // Sine wave horizontal movement - constrained to track width
+                obj.mesh.position.x = Math.sin((Date.now() - obj.birth) * 0.003) * 3.5;
+                obj.mesh.rotation.y += dt * 5;
+            }
+
             if (obj.mesh.position.z > 10) {
                 this.game.scene.remove(obj.mesh);
                 this.objects.splice(i, 1);
@@ -222,10 +284,24 @@ export class World {
             }
 
             if (obj.active) {
+                obj.mesh.updateMatrixWorld();
                 const box = new THREE.Box3().setFromObject(obj.mesh);
                 if (box.intersectsBox(playerBox)) {
-                    if (obj.type === 'obstacle') {
-                        this.game.gameOver();
+                    if (obj.type === 'obstacle' || obj.type === 'drone') {
+                        // Check if shield is active BEFORE calling gameOver
+                        if (this.game.hasShield) {
+                            this.game.hasShield = false;
+                            this.game.shakeIntensity = 10;
+                            this.game.audio.playCrash();
+                            this.game.particles.createExplosion(obj.mesh.position, 0x00ff00, 30);
+
+                            // DESTROY the obstacle so we don't hit it again next frame
+                            this.game.scene.remove(obj.mesh);
+                            obj.active = false;
+                            return; // Stop checking this object
+                        } else {
+                            this.game.gameOver();
+                        }
                     } else if (obj.type === 'coin') {
                         this.game.updateScore(100);
                         this.game.audio.playCoin();

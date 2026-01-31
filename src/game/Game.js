@@ -17,6 +17,11 @@ export class Game {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
+        // Target Camera settings for interpolation
+        this.targetCameraPos = new THREE.Vector3(0, 6, 10);
+        this.targetFOV = 60;
+        this.currentFOV = 60;
+
         // Lighting
         this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
         this.scene.add(this.hemiLight);
@@ -38,41 +43,113 @@ export class Game {
         this.scene.fog = new THREE.Fog(0xFF00FF, 30, 90); // Neon purple fog
         this.scene.background = new THREE.Color(0x220033); // Dark purple background
 
+        // UI Elements
+        this.mainMenu = document.getElementById('main-menu');
+        this.settingsMenu = document.getElementById('settings-menu');
+        this.gameUI = document.getElementById('game-ui');
+        this.startScreen = document.getElementById('start-screen');
+        this.gameOverScreen = document.getElementById('game-over-screen');
+
+        this.scoreElement = document.getElementById('score');
+        this.highScoreElement = document.getElementById('high-score');
+        this.finalScoreElement = document.getElementById('final-score');
+
+        // Settings State
+        this.difficulty = 'normal';
+        this.isMuted = false;
+
+        this.score = 0;
+        this.highScore = parseInt(localStorage.getItem('highscore')) || 0;
+        this.updateHighScoreUI();
+
+        // Core Components
         this.clock = new THREE.Clock();
         this.isPlaying = false;
         this.hasSpeedAbility = false;
         this.isSpeedBoosting = false;
         this.hasMagnet = false;
         this.hasShield = false;
+        this.shakeIntensity = 0;
 
         this.audio = new Audio();
         this.particles = new Particles(this);
         this.world = new World(this);
         this.player = new Player(this);
 
-        this.shakeIntensity = 0;
-
-
-        // UI
-        this.score = 0;
-        this.highScore = parseInt(localStorage.getItem('highscore')) || 0;
-        this.scoreElement = document.getElementById('score');
-        this.highScoreElement = document.getElementById('high-score');
-        this.highScoreElement.innerText = `High Score: ${this.highScore}`;
-
-        this.startScreen = document.getElementById('start-screen');
-        this.gameOverScreen = document.getElementById('game-over-screen');
-        this.finalScoreElement = document.getElementById('final-score');
-
         this.setupUI();
+        this.setupCursor();
         this.animate();
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
 
+    setupCursor() {
+        this.cursor = document.createElement('div');
+        this.cursor.id = 'custom-cursor';
+        document.body.appendChild(this.cursor);
+
+        document.addEventListener('mousemove', (e) => {
+            this.cursor.style.left = e.clientX + 'px';
+            this.cursor.style.top = e.clientY + 'px';
+        });
+
+        // Hover Effect on Buttons
+        const buttons = document.querySelectorAll('button, select, .credits');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => this.cursor.classList.add('cursor-hover'));
+            btn.addEventListener('mouseleave', () => this.cursor.classList.remove('cursor-hover'));
+        });
+
+        // Hide cursor when leaving window
+        document.addEventListener('mouseleave', () => this.cursor.style.display = 'none');
+        document.addEventListener('mouseenter', () => this.cursor.style.display = 'block');
+    }
+
+    updateHighScoreUI() {
+        this.highScoreElement.innerText = `High Score: ${this.highScore}`;
+    }
+
     setupUI() {
+        // Navigation
+        document.getElementById('play-nav-btn').addEventListener('click', () => this.showGameStart());
+        document.getElementById('settings-nav-btn').addEventListener('click', () => this.showSettings());
+        document.getElementById('back-to-menu-btn').addEventListener('click', () => this.showHome());
+        document.getElementById('exit-to-menu-btn').addEventListener('click', () => this.showHome());
+
+        // Game Start/Restart
         document.getElementById('start-btn').addEventListener('click', () => this.startGame());
         document.getElementById('restart-btn').addEventListener('click', () => this.startGame());
+
+        // Settings Logic
+        document.getElementById('toggle-audio').addEventListener('click', (e) => {
+            this.isMuted = !this.isMuted;
+            this.audio.setVolume(this.isMuted ? 0 : 0.5);
+            e.target.innerText = this.isMuted ? 'UNMUTE' : 'MUTE';
+            e.target.style.borderColor = this.isMuted ? '#00ff00' : '#00ffff';
+        });
+
+        document.getElementById('difficulty-select').addEventListener('change', (e) => {
+            this.difficulty = e.target.value;
+        });
+    }
+
+    showHome() {
+        this.isPlaying = false;
+        this.mainMenu.classList.remove('hidden');
+        this.settingsMenu.classList.add('hidden');
+        this.gameUI.classList.add('hidden');
+    }
+
+    showSettings() {
+        this.mainMenu.classList.add('hidden');
+        this.settingsMenu.classList.remove('hidden');
+    }
+
+    showGameStart() {
+        this.mainMenu.classList.add('hidden');
+        this.gameUI.classList.remove('hidden');
+        this.startScreen.classList.remove('hidden');
+        this.gameOverScreen.classList.add('hidden');
     }
 
     startGame() {
@@ -84,32 +161,31 @@ export class Game {
         this.hasMagnet = false;
         this.hasShield = false;
 
+        if (this.speedTimeout) clearTimeout(this.speedTimeout);
+        if (this.magnetTimeout) clearTimeout(this.magnetTimeout);
+        if (this.shieldTimeout) clearTimeout(this.shieldTimeout);
+
         this.startScreen.classList.add('hidden');
         this.gameOverScreen.classList.add('hidden');
+
+        // Apply Difficulty
+        let baseSpeed = 10;
+        if (this.difficulty === 'easy') baseSpeed = 7;
+        if (this.difficulty === 'hard') baseSpeed = 15;
+        this.world.baseSpeed = baseSpeed;
 
         this.world.reset();
         this.player.reset();
     }
 
     gameOver() {
-        if (this.hasShield) {
-            this.hasShield = false;
-            this.shakeIntensity = 10;
-            this.audio.playCrash();
-            this.particles.createExplosion(this.player.mesh.position, 0x00ff00, 30);
-
-            // Push player back slightly or clear nearby obstacles?
-            // For now just shield break effect
-            return;
-        }
-
         this.isPlaying = false;
 
         // Check High Score
         if (this.score > this.highScore) {
             this.highScore = Math.floor(this.score);
             localStorage.setItem('highscore', this.highScore);
-            this.highScoreElement.innerText = `High Score: ${this.highScore}`;
+            this.updateHighScoreUI();
             this.highScoreElement.style.color = '#00ff00'; // Highlight new record
             this.highScoreElement.style.transform = 'scale(1.5)';
             setTimeout(() => {
@@ -136,7 +212,7 @@ export class Game {
     }
 
     activateSpeedAbility() {
-        if (this.hasSpeedAbility) return;
+        if (this.speedTimeout) clearTimeout(this.speedTimeout);
         this.hasSpeedAbility = true;
 
         // Visual notification
@@ -150,22 +226,29 @@ export class Game {
         msg.style.fontSize = '30px';
         msg.style.fontWeight = 'bold';
         msg.style.textShadow = '0 0 10px #00ffff';
-        msg.style.zIndex = '100'; // Ensure it's on top
+        msg.style.zIndex = '100';
         document.body.appendChild(msg);
 
-        setTimeout(() => {
-            msg.remove();
-        }, 3000);
+        setTimeout(() => msg.remove(), 3000);
+
+        this.speedTimeout = setTimeout(() => {
+            this.hasSpeedAbility = false;
+            this.isSpeedBoosting = false; // Force stop boost
+        }, 10000);
     }
 
     activateMagnet() {
+        if (this.magnetTimeout) clearTimeout(this.magnetTimeout);
         this.hasMagnet = true;
-        setTimeout(() => this.hasMagnet = false, 10000); // 10s duration
+        this.magnetTimeout = setTimeout(() => this.hasMagnet = false, 10000);
     }
 
     activateShield() {
+        if (this.shieldTimeout) clearTimeout(this.shieldTimeout);
         this.hasShield = true;
-        this.player.mesh.material.emissive.setHex(0x00ff00); // Visual indicator
+        this.shieldTimeout = setTimeout(() => {
+            this.hasShield = false;
+        }, 10000);
     }
 
     onWindowResize() {
@@ -182,13 +265,33 @@ export class Game {
         this.particles.update(dt); // Always update particles even if game over for effect
 
         if (this.isPlaying) {
-            this.world.update(dt);
             this.player.update(dt);
+            this.world.update(dt);
             this.score += dt * 5;
             this.updateScore(0);
 
-            // Camera follow with slight lag
-            this.camera.position.x += (this.player.mesh.position.x * 0.5 - this.camera.position.x) * 5 * dt;
+            // Camera Follow & Dynamic Perspective
+            const lerpSpeed = this.isSpeedBoosting ? 3 : 5;
+
+            // Camera position shift during boost (lower and further back)
+            if (this.isSpeedBoosting) {
+                this.targetCameraPos.set(this.player.mesh.position.x * 0.5, 3.5, 13);
+                this.targetFOV = 90;
+            } else {
+                this.targetCameraPos.set(this.player.mesh.position.x * 0.5, 6, 10);
+                this.targetFOV = 60;
+            }
+
+            // Smoothly move camera
+            this.camera.position.x += (this.targetCameraPos.x - this.camera.position.x) * lerpSpeed * dt;
+            this.camera.position.y += (this.targetCameraPos.y - this.camera.position.y) * lerpSpeed * dt;
+            this.camera.position.z += (this.targetCameraPos.z - this.camera.position.z) * lerpSpeed * dt;
+
+            // FOV shift
+            this.currentFOV += (this.targetFOV - this.currentFOV) * lerpSpeed * dt;
+            this.camera.fov = this.currentFOV;
+            this.camera.updateProjectionMatrix();
+            this.camera.lookAt(0, 0, -5);
 
             // Camera Shake
             if (this.shakeIntensity > 0) {
@@ -203,6 +306,11 @@ export class Game {
             if (this.isSpeedBoosting) {
                 this.shakeIntensity += 0.2; // Continuous small shake
                 if (this.shakeIntensity > 0.5) this.shakeIntensity = 0.5;
+
+                // Create Speed Lines
+                if (Math.random() > 0.3) {
+                    this.particles.createSpeedLine();
+                }
             }
 
             // Dynamic Lighting

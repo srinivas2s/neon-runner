@@ -6,6 +6,10 @@ export class Audio {
         this.masterGain.connect(this.ctx.destination);
     }
 
+    setVolume(val) {
+        this.masterGain.gain.setValueAtTime(val, this.ctx.currentTime);
+    }
+
     playTone(freq, type, duration, vol = 1) {
         if (this.ctx.state === 'suspended') this.ctx.resume();
 

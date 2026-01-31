@@ -26,14 +26,66 @@ export class Player {
 
         // Inner Glow
         const glowGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+<<<<<<< HEAD
         const glowMat = new THREE.MeshBasicMaterial({ color: 0xccffcc });
         this.glowElement = new THREE.Mesh(glowGeo, glowMat);
         this.mesh.add(this.glowElement);
 
+=======
+        const glowMat = new THREE.MeshStandardMaterial({
+            color: 0xccffcc,
+            emissive: 0xccffcc,
+            emissiveIntensity: 0.2
+        });
+        this.glowElement = new THREE.Mesh(glowGeo, glowMat);
+        this.mesh.add(this.glowElement);
+
+        // Shield Bubble (Hidden by default)
+        const shieldGeo = new THREE.SphereGeometry(1.2, 32, 32);
+        const shieldMat = new THREE.MeshStandardMaterial({
+            color: 0x00ff00,
+            transparent: true,
+            opacity: 0.3,
+            wireframe: true
+        });
+        this.shieldMesh = new THREE.Mesh(shieldGeo, shieldMat);
+        this.shieldMesh.visible = false;
+        this.mesh.add(this.shieldMesh);
+
+>>>>>>> master
         this.game.scene.add(this.mesh);
 
         // Input
         this.handleInput();
+<<<<<<< HEAD
+=======
+        this.handleTouchInput();
+    }
+
+    handleTouchInput() {
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        window.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            const dy = e.changedTouches[0].clientY - touchStartY;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (Math.abs(dx) > 30) {
+                    this.changeLane(dx > 0 ? 1 : -1);
+                }
+            } else {
+                if (dy < -30) {
+                    this.jump();
+                }
+            }
+        }, { passive: true });
+>>>>>>> master
     }
 
     reset() {
@@ -146,6 +198,7 @@ export class Player {
         const time = Date.now() * 0.002;
         const color = new THREE.Color().setHSL((time % 1), 1, 0.5);
         this.mesh.material.color.copy(color);
+<<<<<<< HEAD
         this.mesh.material.emissive.copy(color).multiplyScalar(0.2);
 
         // Speed Trails
@@ -154,21 +207,52 @@ export class Player {
             trailMesh.material = this.mesh.material.clone();
             trailMesh.material.transparent = true;
             trailMesh.material.opacity = 0.5;
+=======
+        this.mesh.material.emissive.copy(color).multiplyScalar(0.2); // Lower for non-bloom look
+
+        // Shield Visual
+        this.shieldMesh.visible = this.game.hasShield;
+        if (this.game.hasShield) {
+            this.shieldMesh.rotation.y += dt * 2;
+            this.shieldMesh.rotation.z += dt;
+        }
+
+        // Speed Trails
+        if (this.game.isSpeedBoosting || Math.random() < 0.3) { // Occasional trail even when normal
+            const trailMesh = this.mesh.clone();
+            trailMesh.material = this.mesh.material.clone();
+            trailMesh.material.transparent = true;
+            trailMesh.material.opacity = this.game.isSpeedBoosting ? 0.6 : 0.2;
+>>>>>>> master
             trailMesh.position.copy(this.mesh.position);
             trailMesh.rotation.copy(this.mesh.rotation);
             trailMesh.scale.copy(this.mesh.scale);
             this.game.scene.add(trailMesh);
 
+<<<<<<< HEAD
             // Animate fade out and remove
             const fadeOut = () => {
                 trailMesh.material.opacity -= 0.05;
                 trailMesh.scale.multiplyScalar(0.9);
+=======
+            const trailLife = this.game.isSpeedBoosting ? 0.5 : 0.2;
+            let age = 0;
+
+            const fadeOut = (t) => {
+                age += 0.05;
+                trailMesh.material.opacity -= 0.05;
+                trailMesh.scale.multiplyScalar(0.95);
+>>>>>>> master
                 if (trailMesh.material.opacity <= 0) {
                     this.game.scene.remove(trailMesh);
                     trailMesh.geometry.dispose();
                     trailMesh.material.dispose();
                 } else {
+<<<<<<< HEAD
                     requestAnimationFrame(fadeOut);
+=======
+                    setTimeout(() => fadeOut(), 32); // ~30fps for trail fade
+>>>>>>> master
                 }
             };
             fadeOut();

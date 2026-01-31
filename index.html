@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<<<<<<< HEAD
   <title>Neon Runner</title>
   <link rel="stylesheet" href="./style.css">
 </head>
@@ -23,6 +24,86 @@
       <h1>GAME OVER</h1>
       <p id="final-score">Score: 0</p>
       <button id="restart-btn">TRY AGAIN</button>
+=======
+  <title>Neon Runner | Designed by Srinivas</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <!-- Animated Background SVGs -->
+  <div id="bg-container">
+    <svg class="bg-shape shape-1" viewBox="0 0 200 200">
+      <path fill="rgba(0, 255, 255, 0.05)"
+        d="M40,-64C53.3,-58.5,66.7,-50.3,75.3,-38.4C83.9,-26.4,87.7,-10.7,85.6,4.3C83.5,19.3,75.5,33.5,65.3,46.1C55.1,58.7,42.7,69.7,28.7,75.1C14.7,80.5,-0.9,80.3,-16,76.5C-31.1,72.7,-45.7,65.4,-57.4,54.5C-69.1,43.6,-77.9,29.1,-81.4,13.7C-84.9,-1.7,-83.1,-18,-75,-32.1C-66.9,-46.2,-52.5,-58.1,-37.8,-63.1C-23.1,-68.1,-8.1,-66.2,3.8,-72.7C15.7,-79.3,31.4,-77.6,40,-64Z"
+        transform="translate(100 100)" />
+    </svg>
+    <svg class="bg-shape shape-2" viewBox="0 0 200 200">
+      <path fill="rgba(255, 0, 255, 0.05)"
+        d="M44.4,-76.1C57.4,-69.5,67.8,-57.4,75.5,-44.1C83.2,-30.8,88.2,-16.3,87.6,-2C87,12.3,80.8,26.4,72.7,39.1C64.6,51.8,54.6,63.1,42.2,71.2C29.8,79.3,14.9,84.2,-0.2,84.5C-15.3,84.8,-30.6,80.5,-44,72.9C-57.4,65.3,-68.9,54.4,-76.6,41.4C-84.3,28.4,-88.2,13.3,-87.4,-1.4C-86.6,-16.1,-81.1,-30.3,-72.3,-42.8C-63.5,-55.3,-51.4,-66.1,-37.9,-72.4C-24.4,-78.7,-9.5,-80.5,3.3,-86.1C16.1,-91.7,31.4,-82.7,44.4,-76.1Z"
+        transform="translate(100 100)" />
+    </svg>
+    <div class="bg-grid"></div>
+  </div>
+
+  <div id="ui">
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen">
+      <h1>Neon Runner</h1>
+      <p class="tagline">The Ultimate Cyber Challenge</p>
+      <div class="menu-buttons">
+        <button id="play-nav-btn">PLAY NOW</button>
+        <button id="settings-nav-btn">SETTINGS</button>
+      </div>
+      <div class="credits">
+        Designed & Developed by <span class="name">Srinivas</span>
+      </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div id="settings-menu" class="screen hidden">
+      <h1>Settings</h1>
+      <div class="settings-list">
+        <div class="setting-item">
+          <label>Audio</label>
+          <button id="toggle-audio">MUTE</button>
+        </div>
+        <div class="setting-item">
+          <label>Difficulty</label>
+          <select id="difficulty-select">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Insane</option>
+          </select>
+        </div>
+      </div>
+      <button id="back-to-menu-btn" class="secondary-btn">BACK</button>
+    </div>
+
+    <!-- In-Game UI -->
+    <div id="game-ui" class="screen hidden">
+      <div id="score">Score: 0</div>
+      <div id="high-score">High Score: 0</div>
+
+      <div id="start-screen" class="overlay">
+        <h1>Ready?</h1>
+        <p>Press ARROW KEYS to Move & Jump</p>
+        <button id="start-btn">START RUN</button>
+      </div>
+
+      <div id="game-over-screen" class="overlay hidden">
+        <h1>GAME OVER</h1>
+        <p id="final-score">Score: 0</p>
+        <div class="menu-buttons">
+          <button id="restart-btn">TRY AGAIN</button>
+          <button id="exit-to-menu-btn" class="secondary-btn">EXIT</button>
+        </div>
+      </div>
+>>>>>>> master
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>

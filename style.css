@@ -1,11 +1,4 @@
 :root {
-<<<<<<< HEAD
-    --font-main: 'Verdana', sans-serif;
-    --color-primary: #ffff00;
-    --color-neon-blue: #00ffff;
-    --color-neon-pink: #ff00ff;
-    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-=======
     --font-main: 'Outfit', sans-serif;
     --font-accent: 'Orbitron', sans-serif;
     --color-primary: #ffff00;
@@ -13,17 +6,12 @@
     --color-neon-pink: #ff00ff;
     --color-neon-green: #00ff00;
     --bg-dark: rgba(10, 5, 20, 0.9);
->>>>>>> master
 }
 
 body {
     margin: 0;
     overflow: hidden;
     font-family: var(--font-main);
-<<<<<<< HEAD
-    background: var(--bg-gradient);
-    user-select: none;
-=======
     background: #05000a;
     user-select: none;
     color: white;
@@ -49,15 +37,12 @@ body {
     transform: scale(3);
     background: var(--color-neon-pink) !important;
     box-shadow: 0 0 20px var(--color-neon-pink) !important;
->>>>>>> master
 }
 
 canvas {
     display: block;
 }
 
-<<<<<<< HEAD
-=======
 /* Dynamic Background */
 #bg-container {
     position: fixed;
@@ -135,7 +120,6 @@ canvas {
     }
 }
 
->>>>>>> master
 #ui {
     position: absolute;
     top: 0;
@@ -145,81 +129,11 @@ canvas {
     pointer-events: none;
 }
 
-<<<<<<< HEAD
-#score {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    font-size: 3rem;
-    font-weight: 900;
-    color: #fff;
-    text-shadow:
-        0 0 5px #fff,
-        0 0 10px #fff,
-        0 0 20px var(--color-neon-pink),
-        0 0 30px var(--color-neon-pink);
-    transition: transform 0.1s;
-}
-
-#start-screen,
-#game-over-screen {
-=======
 .screen {
->>>>>>> master
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-<<<<<<< HEAD
-    text-align: center;
-    background: rgba(0, 0, 0, 0.85);
-    /* Darker semi-transparent */
-    padding: 60px;
-    border-radius: 30px;
-    color: white;
-    pointer-events: auto;
-    border: 2px solid var(--color-neon-blue);
-    box-shadow: 0 0 20px var(--color-neon-blue);
-    backdrop-filter: blur(5px);
-    min-width: 300px;
-}
-
-h1 {
-    margin: 0 0 30px 0;
-    font-size: 3.5rem;
-    color: #fff;
-    text-shadow:
-        0 0 5px #fff,
-        0 0 10px #fff,
-        0 0 20px var(--color-neon-blue),
-        0 0 40px var(--color-neon-blue);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-p {
-    font-size: 1.2rem;
-    color: #ddd;
-    margin-bottom: 40px;
-}
-
-button {
-    background: transparent;
-    color: var(--color-neon-blue);
-    border: 2px solid var(--color-neon-blue);
-    padding: 15px 40px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 0 10px var(--color-neon-blue);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-=======
     width: 100%;
     height: 100%;
     display: flex;
@@ -292,42 +206,11 @@ button {
     text-transform: uppercase;
     letter-spacing: 3px;
     min-width: 250px;
->>>>>>> master
 }
 
 button:hover {
     background: var(--color-neon-blue);
     color: #000;
-<<<<<<< HEAD
-    box-shadow: 0 0 20px var(--color-neon-blue), 0 0 40px var(--color-neon-blue);
-}
-
-button:active {
-    transform: scale(0.95);
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Animations */
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-#start-btn {
-    animation: pulse 2s infinite;
-=======
     transform: scale(1.05) translateY(-3px);
     box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
 }
@@ -490,5 +373,4 @@ select {
 
 #game-ui .overlay {
     pointer-events: auto;
->>>>>>> master
 }

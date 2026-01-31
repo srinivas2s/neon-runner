@@ -17,14 +17,11 @@ export class Game {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(this.renderer.domElement);
 
-<<<<<<< HEAD
-=======
         // Target Camera settings for interpolation
         this.targetCameraPos = new THREE.Vector3(0, 6, 10);
         this.targetFOV = 60;
         this.currentFOV = 60;
 
->>>>>>> master
         // Lighting
         this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
         this.scene.add(this.hemiLight);
@@ -46,8 +43,6 @@ export class Game {
         this.scene.fog = new THREE.Fog(0xFF00FF, 30, 90); // Neon purple fog
         this.scene.background = new THREE.Color(0x220033); // Dark purple background
 
-<<<<<<< HEAD
-=======
         // UI Elements
         this.mainMenu = document.getElementById('main-menu');
         this.settingsMenu = document.getElementById('settings-menu');
@@ -68,61 +63,36 @@ export class Game {
         this.updateHighScoreUI();
 
         // Core Components
->>>>>>> master
         this.clock = new THREE.Clock();
         this.isPlaying = false;
         this.hasSpeedAbility = false;
         this.isSpeedBoosting = false;
         this.hasMagnet = false;
         this.hasShield = false;
-<<<<<<< HEAD
-=======
         this.shakeIntensity = 0;
->>>>>>> master
 
         this.audio = new Audio();
         this.particles = new Particles(this);
         this.world = new World(this);
         this.player = new Player(this);
 
-<<<<<<< HEAD
-        this.shakeIntensity = 0;
-
-
-        // UI
-        this.score = 0;
-        this.highScore = parseInt(localStorage.getItem('highscore')) || 0;
-        this.scoreElement = document.getElementById('score');
-        this.highScoreElement = document.getElementById('high-score');
-        this.highScoreElement.innerText = `High Score: ${this.highScore}`;
-
-        this.startScreen = document.getElementById('start-screen');
-        this.gameOverScreen = document.getElementById('game-over-screen');
-        this.finalScoreElement = document.getElementById('final-score');
-
-        this.setupUI();
-=======
         this.setupUI();
         this.setupCursor();
->>>>>>> master
         this.animate();
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
 
-<<<<<<< HEAD
-    setupUI() {
-        document.getElementById('start-btn').addEventListener('click', () => this.startGame());
-        document.getElementById('restart-btn').addEventListener('click', () => this.startGame());
-=======
     setupCursor() {
         this.cursor = document.createElement('div');
         this.cursor.id = 'custom-cursor';
         document.body.appendChild(this.cursor);
 
         document.addEventListener('mousemove', (e) => {
-            this.cursor.style.left = e.clientX + 'px';
-            this.cursor.style.top = e.clientY + 'px';
+            if (this.cursor) {
+                this.cursor.style.left = e.clientX + 'px';
+                this.cursor.style.top = e.clientY + 'px';
+            }
         });
 
         // Hover Effect on Buttons
@@ -133,12 +103,18 @@ export class Game {
         });
 
         // Hide cursor when leaving window
-        document.addEventListener('mouseleave', () => this.cursor.style.display = 'none');
-        document.addEventListener('mouseenter', () => this.cursor.style.display = 'block');
+        document.addEventListener('mouseleave', () => {
+            if (this.cursor) this.cursor.style.display = 'none';
+        });
+        document.addEventListener('mouseenter', () => {
+            if (this.cursor) this.cursor.style.display = 'block';
+        });
     }
 
     updateHighScoreUI() {
-        this.highScoreElement.innerText = `High Score: ${this.highScore}`;
+        if (this.highScoreElement) {
+            this.highScoreElement.innerText = `High Score: ${this.highScore}`;
+        }
     }
 
     setupUI() {
@@ -182,7 +158,6 @@ export class Game {
         this.gameUI.classList.remove('hidden');
         this.startScreen.classList.remove('hidden');
         this.gameOverScreen.classList.add('hidden');
->>>>>>> master
     }
 
     startGame() {
@@ -194,11 +169,6 @@ export class Game {
         this.hasMagnet = false;
         this.hasShield = false;
 
-<<<<<<< HEAD
-        this.startScreen.classList.add('hidden');
-        this.gameOverScreen.classList.add('hidden');
-
-=======
         if (this.speedTimeout) clearTimeout(this.speedTimeout);
         if (this.magnetTimeout) clearTimeout(this.magnetTimeout);
         if (this.shieldTimeout) clearTimeout(this.shieldTimeout);
@@ -212,37 +182,18 @@ export class Game {
         if (this.difficulty === 'hard') baseSpeed = 15;
         this.world.baseSpeed = baseSpeed;
 
->>>>>>> master
         this.world.reset();
         this.player.reset();
     }
 
     gameOver() {
-<<<<<<< HEAD
-        if (this.hasShield) {
-            this.hasShield = false;
-            this.shakeIntensity = 10;
-            this.audio.playCrash();
-            this.particles.createExplosion(this.player.mesh.position, 0x00ff00, 30);
-
-            // Push player back slightly or clear nearby obstacles?
-            // For now just shield break effect
-            return;
-        }
-
-=======
->>>>>>> master
         this.isPlaying = false;
 
         // Check High Score
         if (this.score > this.highScore) {
             this.highScore = Math.floor(this.score);
             localStorage.setItem('highscore', this.highScore);
-<<<<<<< HEAD
-            this.highScoreElement.innerText = `High Score: ${this.highScore}`;
-=======
             this.updateHighScoreUI();
->>>>>>> master
             this.highScoreElement.style.color = '#00ff00'; // Highlight new record
             this.highScoreElement.style.transform = 'scale(1.5)';
             setTimeout(() => {
@@ -269,11 +220,7 @@ export class Game {
     }
 
     activateSpeedAbility() {
-<<<<<<< HEAD
-        if (this.hasSpeedAbility) return;
-=======
         if (this.speedTimeout) clearTimeout(this.speedTimeout);
->>>>>>> master
         this.hasSpeedAbility = true;
 
         // Visual notification
@@ -287,24 +234,6 @@ export class Game {
         msg.style.fontSize = '30px';
         msg.style.fontWeight = 'bold';
         msg.style.textShadow = '0 0 10px #00ffff';
-<<<<<<< HEAD
-        msg.style.zIndex = '100'; // Ensure it's on top
-        document.body.appendChild(msg);
-
-        setTimeout(() => {
-            msg.remove();
-        }, 3000);
-    }
-
-    activateMagnet() {
-        this.hasMagnet = true;
-        setTimeout(() => this.hasMagnet = false, 10000); // 10s duration
-    }
-
-    activateShield() {
-        this.hasShield = true;
-        this.player.mesh.material.emissive.setHex(0x00ff00); // Visual indicator
-=======
         msg.style.zIndex = '100';
         document.body.appendChild(msg);
 
@@ -328,7 +257,6 @@ export class Game {
         this.shieldTimeout = setTimeout(() => {
             this.hasShield = false;
         }, 10000);
->>>>>>> master
     }
 
     onWindowResize() {
@@ -345,15 +273,6 @@ export class Game {
         this.particles.update(dt); // Always update particles even if game over for effect
 
         if (this.isPlaying) {
-<<<<<<< HEAD
-            this.world.update(dt);
-            this.player.update(dt);
-            this.score += dt * 5;
-            this.updateScore(0);
-
-            // Camera follow with slight lag
-            this.camera.position.x += (this.player.mesh.position.x * 0.5 - this.camera.position.x) * 5 * dt;
-=======
             this.player.update(dt);
             this.world.update(dt);
             this.score += dt * 5;
@@ -381,7 +300,6 @@ export class Game {
             this.camera.fov = this.currentFOV;
             this.camera.updateProjectionMatrix();
             this.camera.lookAt(0, 0, -5);
->>>>>>> master
 
             // Camera Shake
             if (this.shakeIntensity > 0) {
@@ -396,14 +314,11 @@ export class Game {
             if (this.isSpeedBoosting) {
                 this.shakeIntensity += 0.2; // Continuous small shake
                 if (this.shakeIntensity > 0.5) this.shakeIntensity = 0.5;
-<<<<<<< HEAD
-=======
 
                 // Create Speed Lines
                 if (Math.random() > 0.3) {
                     this.particles.createSpeedLine();
                 }
->>>>>>> master
             }
 
             // Dynamic Lighting

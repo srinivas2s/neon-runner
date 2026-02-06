@@ -48,7 +48,9 @@ export class Game {
         this.settingsMenu = document.getElementById('settings-menu');
         this.gameUI = document.getElementById('game-ui');
         this.startScreen = document.getElementById('start-screen');
+        this.pauseMenu = document.getElementById('pause-menu');
         this.gameOverScreen = document.getElementById('game-over-screen');
+        this.pauseBtn = document.getElementById('pause-btn');
 
         this.scoreElement = document.getElementById('score');
         this.highScoreElement = document.getElementById('high-score');
@@ -65,6 +67,7 @@ export class Game {
         // Core Components
         this.clock = new THREE.Clock();
         this.isPlaying = false;
+        this.isPaused = false;
         this.hasSpeedAbility = false;
         this.isSpeedBoosting = false;
         this.hasMagnet = false;
@@ -77,39 +80,12 @@ export class Game {
         this.player = new Player(this);
 
         this.setupUI();
-        this.setupCursor();
         this.animate();
 
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
 
-    setupCursor() {
-        this.cursor = document.createElement('div');
-        this.cursor.id = 'custom-cursor';
-        document.body.appendChild(this.cursor);
 
-        document.addEventListener('mousemove', (e) => {
-            if (this.cursor) {
-                this.cursor.style.left = e.clientX + 'px';
-                this.cursor.style.top = e.clientY + 'px';
-            }
-        });
-
-        // Hover Effect on Buttons
-        const buttons = document.querySelectorAll('button, select, .credits');
-        buttons.forEach(btn => {
-            btn.addEventListener('mouseenter', () => this.cursor.classList.add('cursor-hover'));
-            btn.addEventListener('mouseleave', () => this.cursor.classList.remove('cursor-hover'));
-        });
-
-        // Hide cursor when leaving window
-        document.addEventListener('mouseleave', () => {
-            if (this.cursor) this.cursor.style.display = 'none';
-        });
-        document.addEventListener('mouseenter', () => {
-            if (this.cursor) this.cursor.style.display = 'block';
-        });
-    }
 
     updateHighScoreUI() {
         if (this.highScoreElement) {
@@ -139,13 +115,29 @@ export class Game {
         document.getElementById('difficulty-select').addEventListener('change', (e) => {
             this.difficulty = e.target.value;
         });
+
+        // Pause Logic
+        this.pauseBtn.addEventListener('click', () => this.togglePause());
+        document.getElementById('resume-btn').addEventListener('click', () => this.resumeGame());
+        document.getElementById('restart-pause-btn').addEventListener('click', () => this.startGame());
+        document.getElementById('exit-pause-btn').addEventListener('click', () => this.showHome());
+
+        // Keyboard Pause (Escape or P)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+                if (this.isPlaying && !this.gameOverScreen.classList.contains('hidden')) return;
+                if (this.isPlaying) this.togglePause();
+            }
+        });
     }
 
     showHome() {
         this.isPlaying = false;
+        this.isPaused = false;
         this.mainMenu.classList.remove('hidden');
         this.settingsMenu.classList.add('hidden');
         this.gameUI.classList.add('hidden');
+        this.pauseMenu.classList.add('hidden');
     }
 
     showSettings() {
@@ -165,6 +157,7 @@ export class Game {
         if (isTouch && instruction) {
             instruction.innerText = 'Swipe to Move & Jump\nDouble Tap for Speed';
         }
+        this.pauseBtn.classList.add('hidden'); // Hide pause button on start screen
     }
 
     startGame() {
@@ -182,6 +175,9 @@ export class Game {
 
         this.startScreen.classList.add('hidden');
         this.gameOverScreen.classList.add('hidden');
+        this.pauseMenu.classList.add('hidden');
+        this.pauseBtn.classList.remove('hidden');
+        this.isPaused = false;
 
         // Apply Difficulty
         let baseSpeed = 10;
@@ -211,8 +207,26 @@ export class Game {
 
         this.finalScoreElement.innerText = `Score: ${Math.floor(this.score)}`;
         this.gameOverScreen.classList.remove('hidden');
+        this.pauseBtn.classList.add('hidden');
         this.audio.playCrash();
         this.particles.createExplosion(this.player.mesh.position, 0xff0000, 20); // Boom
+    }
+
+    togglePause() {
+        if (!this.isPlaying) return;
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            this.pauseMenu.classList.remove('hidden');
+            this.pauseBtn.innerText = '▶';
+        } else {
+            this.resumeGame();
+        }
+    }
+
+    resumeGame() {
+        this.isPaused = false;
+        this.pauseMenu.classList.add('hidden');
+        this.pauseBtn.innerText = 'II';
     }
 
     updateScore(amount) {
@@ -280,7 +294,7 @@ export class Game {
 
         this.particles.update(dt); // Always update particles even if game over for effect
 
-        if (this.isPlaying) {
+        if (this.isPlaying && !this.isPaused) {
             this.player.update(dt);
             this.world.update(dt);
             this.score += dt * 5;

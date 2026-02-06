@@ -67,11 +67,21 @@
     <div id="game-ui" class="screen hidden">
       <div id="score">Score: 0</div>
       <div id="high-score">High Score: 0</div>
+      <button id="pause-btn">II</button>
 
       <div id="start-screen" class="overlay">
         <h1>Ready?</h1>
         <p id="start-instruction">Press ARROW KEYS to Move & Jump</p>
         <button id="start-btn">START RUN</button>
+      </div>
+
+      <div id="pause-menu" class="overlay hidden">
+        <h1>PAUSED</h1>
+        <div class="menu-buttons">
+          <button id="resume-btn">RESUME</button>
+          <button id="restart-pause-btn">RESTART</button>
+          <button id="exit-pause-btn" class="secondary-btn">EXIT</button>
+        </div>
       </div>
 
       <div id="game-over-screen" class="overlay hidden">

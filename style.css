@@ -16,29 +16,9 @@ body {
     user-select: none;
     touch-action: none;
     color: white;
-    cursor: none;
-    /* Custom cursor */
 }
 
-/* Custom Cursor */
-#custom-cursor {
-    width: 20px;
-    height: 20px;
-    background: var(--color-neon-blue);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: screen;
-    transition: transform 0.1s ease-out, background 0.3s;
-    box-shadow: 0 0 10px var(--color-neon-blue);
-}
 
-.cursor-hover {
-    transform: scale(3);
-    background: var(--color-neon-pink) !important;
-    box-shadow: 0 0 20px var(--color-neon-pink) !important;
-}
 
 canvas {
     display: block;
@@ -346,19 +326,32 @@ select {
         top: 20px;
         right: 20px;
     }
-
-    #custom-cursor {
-        display: none !important;
-    }
 }
 
 /* In-game HUD */
 #score {
     position: absolute;
-    top: 40px;
+    top: 100px;
     right: 40px;
     font-size: 3rem;
     font-family: var(--font-accent);
+}
+
+#pause-btn {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    min-width: 60px;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    pointer-events: auto;
 }
 
 #high-score {

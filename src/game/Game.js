@@ -158,6 +158,13 @@ export class Game {
         this.gameUI.classList.remove('hidden');
         this.startScreen.classList.remove('hidden');
         this.gameOverScreen.classList.add('hidden');
+
+        // Update instruction text for mobile
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        const instruction = document.getElementById('start-instruction');
+        if (isTouch && instruction) {
+            instruction.innerText = 'Swipe to Move & Jump\nDouble Tap for Speed';
+        }
     }
 
     startGame() {
@@ -225,7 +232,8 @@ export class Game {
 
         // Visual notification
         const msg = document.createElement('div');
-        msg.innerText = "SPEED BOOST UNLOCKED! HOLD SPACE!";
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        msg.innerText = isTouch ? "SPEED BOOST UNLOCKED! DOUBLE TAP!" : "SPEED BOOST UNLOCKED! HOLD SPACE!";
         msg.style.position = 'absolute';
         msg.style.top = '20%';
         msg.style.width = '100%';

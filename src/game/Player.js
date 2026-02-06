@@ -56,10 +56,21 @@ export class Player {
     handleTouchInput() {
         let touchStartX = 0;
         let touchStartY = 0;
+        let lastTapTime = 0;
 
         window.addEventListener('touchstart', (e) => {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
+
+            // Double tap detection
+            const currentTime = Date.now();
+            const tapLength = currentTime - lastTapTime;
+            if (tapLength < 300 && tapLength > 0) {
+                if (this.game.hasSpeedAbility) {
+                    this.game.isSpeedBoosting = !this.game.isSpeedBoosting;
+                }
+            }
+            lastTapTime = currentTime;
         }, { passive: true });
 
         window.addEventListener('touchend', (e) => {

@@ -14,6 +14,7 @@ body {
     font-family: var(--font-main);
     background: #05000a;
     user-select: none;
+    touch-action: none;
     color: white;
     cursor: none;
     /* Custom cursor */
@@ -344,6 +345,10 @@ select {
         font-size: 2rem;
         top: 20px;
         right: 20px;
+    }
+
+    #custom-cursor {
+        display: none !important;
     }
 }
 

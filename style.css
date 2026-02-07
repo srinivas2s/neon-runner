@@ -295,38 +295,7 @@ select {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 3rem;
-        letter-spacing: 5px;
-    }
 
-    .screen {
-        padding: 20px;
-    }
-
-    .settings-list {
-        min-width: 90%;
-        padding: 20px;
-    }
-
-    button {
-        padding: 15px 30px;
-        min-width: 200px;
-        font-size: 1rem;
-    }
-
-    .credits {
-        font-size: 1rem;
-        bottom: 30px;
-    }
-
-    #score {
-        font-size: 2rem;
-        top: 20px;
-        right: 20px;
-    }
-}
 
 /* In-game HUD */
 #score {

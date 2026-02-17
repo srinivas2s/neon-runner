@@ -90,5 +90,4 @@ Follow the local link (usually `http://localhost:5173`) in your browser.
 ## Credits
 
 **Designed & Developed by Srinivas**
-
 *Pushing the limits of web-based 3D gaming.*
